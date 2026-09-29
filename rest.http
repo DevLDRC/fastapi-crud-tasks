@@ -1,0 +1,69 @@
+@url = http://127.0.0.1:8000
+@itemId = {{createItem.response.body.$.id}}
+@currentUserToken = {{LoginUser.response.body.$.token}}
+@nameMockHero = john
+@passwordMockHero = John001
+
+### Home ###
+
+GET {{url}}
+
+### Auth ###
+
+POST {{url}}/auth/register
+Content-Type: application/json
+
+{
+	"name": "{{ nameMockHero }}",
+	"email": "{{ nameMockHero }}@gmail.com",
+	"password": "{{ passwordMockHero }}"
+}
+
+###
+
+# @name LoginUser
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+	"email": "{{ nameMockHero }}@gmail.com",
+	"password": "{{ passwordMockHero }}"
+}
+
+### Items ###
+
+GET {{url}}/items
+
+Authorization: Bearer {{currentUserToken}}
+
+### 
+
+# @name createItem
+POST {{url}}/items/
+Content-Type: application/json
+
+{
+	"name": "{{ nameMockHero }} item",
+	"description": "Alpha"
+}
+
+###
+
+# @name showItem
+GET {{url}}/items/{{itemId}}
+
+###
+
+# @name updateItem
+PUT {{url}}/items/{{itemId}}
+Content-Type: application/json
+
+{
+	"name": "{{ nameMockHero }} item updated",
+	"description": "Beta"
+}
+
+###
+
+# @name deleteItem
+DELETE {{url}}/items/{{itemId}}
