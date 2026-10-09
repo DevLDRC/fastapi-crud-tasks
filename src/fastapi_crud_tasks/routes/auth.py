@@ -23,19 +23,20 @@ passwordHash = PasswordHash.recommended()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
 def getUserAuthentication(token: Annotated[str, Depends(oauth2_scheme)]):
 
     secretKey = os.getenv("SECRET_SIGNATURE")
 
     try:
         payload = jwt.decode(token, secretKey, algorithms="HS256")
-        print(payload)
+        userCredentials = payload.get('user')
     except jwt.InvalidTokenError:
         return {
             "401": "Não autorizado"
         }
 
-    return {"pegou": "PEGO"}
+    return userCredentials
 
 
 @route.post("/register")
@@ -85,9 +86,11 @@ def LoginUser(user: auth.UserLogin, db: Session = Depends(get_db)):
     expireToken = datetime.now(timezone.utc) + timedelta(seconds=30)
 
     userEncodePayload = {
-        "sub": userCredentials.id,
-        "name": userCredentials.name,
-        "email": user.email,
+        "sub": str(userCredentials.id),
+        "user": {
+            "name": userCredentials.name,
+            "email": user.email
+        },
         "exp": expireToken
     }
 

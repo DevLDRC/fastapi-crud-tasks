@@ -33,7 +33,6 @@ Content-Type: application/json
 ### Items ###
 
 GET {{url}}/items
-
 Authorization: Bearer {{currentUserToken}}
 
 ### 

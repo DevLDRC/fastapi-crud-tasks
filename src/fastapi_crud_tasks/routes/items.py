@@ -13,8 +13,10 @@ route = APIRouter(
 
 
 @route.get("/")
-async def showAllItems(currentUser: Annotated[models.User, Depends(getUserAuthentication)], db: Session = Depends(get_db)):
-    return currentUser
+async def showAllItems(currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)], db: Session = Depends(get_db)):
+    return {
+        "me": currentUser
+    }
     # return db.query(models.Item).all()
 
 
