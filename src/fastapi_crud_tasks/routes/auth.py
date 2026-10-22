@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime, timedelta, timezone
 from turtle import st
 from typing import Annotated
-from fastapi import Depends, APIRouter
+from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from ..dtos import users, auth
@@ -30,13 +31,21 @@ def getUserAuthentication(token: Annotated[str, Depends(oauth2_scheme)]):
 
     try:
         payload = jwt.decode(token, secretKey, algorithms="HS256")
-        userCredentials = payload.get('user')
     except jwt.InvalidTokenError:
-        return {
-            "401": "Não autorizado"
-        }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-    return userCredentials
+    return payload
+
+
+@route.get("/me")
+async def getUser(currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)]):
+    return {
+        "me": currentUser
+    }
 
 
 @route.post("/register")
@@ -49,8 +58,10 @@ def createUser(user: users.UserCreate, db: Session = Depends(get_db)):
             "409": "Email ja cadastrado"
         }
 
+    userId = str(uuid.uuid4())
     userPasswordHashed = passwordHash.hash(user.password)
     dbUser = models.User(
+        id=userId,
         name=user.name,
         email=user.email,
         password=userPasswordHashed

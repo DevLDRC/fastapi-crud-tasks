@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
@@ -13,16 +14,28 @@ route = APIRouter(
 
 
 @route.get("/")
-async def showAllItems(currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)], db: Session = Depends(get_db)):
-    return {
-        "me": currentUser
-    }
-    # return db.query(models.Item).all()
+async def showAllItems(
+    currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)],
+    db: Session = Depends(get_db)
+):
+    return db.query(models.Item).filter(models.Item.user_id == currentUser["sub"]).all()
 
 
 @route.post("/")
-def createItem(item: items.ItemCreate, db: Session = Depends(get_db)):
-    dbItem = models.Item(name=item.name, description=item.description)
+async def createItem(
+    currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)],
+    item: items.ItemCreate,
+    db: Session = Depends(get_db)
+):
+
+    itemId = str(uuid.uuid4())
+
+    dbItem = models.Item(
+        id=itemId,
+        name=item.name,
+        description=item.description,
+        user_id=currentUser["sub"]
+    )
     db.add(dbItem)
     db.commit()
     db.refresh(dbItem)
@@ -30,8 +43,9 @@ def createItem(item: items.ItemCreate, db: Session = Depends(get_db)):
 
 
 @route.get("/{itemId}")
-def showItem(
-    itemId: int,
+async def showItem(
+    currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)],
+    itemId: str,
     db: Session = Depends(get_db)
 ):
     # search item
@@ -48,8 +62,9 @@ def showItem(
 
 
 @route.put("/{itemId}")
-def updateItem(
-    itemId: int,
+async def updateItem(
+    currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)],
+    itemId: str,
     updatedItem: items.ItemUpdate,
     db: Session = Depends(get_db)
 ):
@@ -74,8 +89,9 @@ def updateItem(
 
 
 @route.delete("/{itemId}")
-def deleteItem(
-    itemId: int,
+async def deleteItem(
+    currentUser: Annotated[dict[str, str], Depends(getUserAuthentication)],
+    itemId: str,
     db: Session = Depends(get_db)
 ):
     # search item

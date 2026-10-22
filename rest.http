@@ -30,6 +30,11 @@ Content-Type: application/json
 	"password": "{{ passwordMockHero }}"
 }
 
+###
+
+GET {{url}}/auth/me
+Authorization: Bearer {{currentUserToken}}
+
 ### Items ###
 
 GET {{url}}/items
@@ -40,6 +45,7 @@ Authorization: Bearer {{currentUserToken}}
 # @name createItem
 POST {{url}}/items/
 Content-Type: application/json
+Authorization: Bearer {{currentUserToken}}
 
 {
 	"name": "{{ nameMockHero }} item",
@@ -50,12 +56,14 @@ Content-Type: application/json
 
 # @name showItem
 GET {{url}}/items/{{itemId}}
+Authorization: Bearer {{currentUserToken}}
 
 ###
 
 # @name updateItem
 PUT {{url}}/items/{{itemId}}
 Content-Type: application/json
+Authorization: Bearer {{currentUserToken}}
 
 {
 	"name": "{{ nameMockHero }} item updated",
@@ -66,3 +74,4 @@ Content-Type: application/json
 
 # @name deleteItem
 DELETE {{url}}/items/{{itemId}}
+Authorization: Bearer {{currentUserToken}}
