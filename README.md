@@ -6,8 +6,7 @@ API REST para gerenciamento de tarefas e autenticação de usuários, desenvolvi
 
 ## 📋 Pré-requisitos
 
-Antes de iniciar, certifique-se de ter instalado em sua máquina:
-
+Para executar a aplicação diretamente na máquina:
 - [Python](https://www.python.org/) (versão `>= 3.14`)
 - [uv](https://docs.astral.sh/uv/) (gerenciador de dependências e ambientes Python)
   - *Instalação rápida do `uv`:*
@@ -15,9 +14,12 @@ Antes de iniciar, certifique-se de ter instalado em sua máquina:
     - **Linux / macOS:** `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - [Git](https://git-scm.com/)
 
+Para executar em container isolado (dispensa a instalação de Python ou uv locais):
+- [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/)
+
 ---
 
-## 🚀 Guia de Execução Local
+## 🚀 Guia de Execução Local (com uv)
 
 Siga o passo a passo abaixo para clonar, configurar e rodar o projeto localmente:
 
@@ -41,7 +43,7 @@ Crie o arquivo `.env` a partir do modelo `.env.example`:
   cp .env.example .env
   ```
 
-Edite o arquivo `.env` gerado e defina uma chave segura para a assinatura dos tokens JWT:
+Edite o arquivo `.env` gerado e defina uma chave para a assinatura dos tokens JWT:
 
 ```env
 SECRET_SIGNATURE="sua_chave_secreta_aqui"
@@ -49,7 +51,7 @@ SECRET_SIGNATURE="sua_chave_secreta_aqui"
 
 ### 3. Instalar as dependências
 
-Instale todas as dependências do projeto (incluindo as de desenvolvimento e testes) utilizando o `uv`:
+Instale todas as dependências do projeto (incluindo desenvolvimento e testes) utilizando o `uv`:
 
 ```bash
 uv sync
@@ -69,9 +71,56 @@ A aplicação estará acessível em: `http://127.0.0.1:8000`
 
 ---
 
+## 🐳 Executando com Docker (Ambiente Isolado)
+
+Se preferir rodar a aplicação em um ambiente conteinerizado sem precisar configurar Python ou dependências na máquina:
+
+### Opção 1: Via Docker Compose (Recomendado)
+
+O projeto inclui um [`docker-compose.yml`](docker-compose.yml) configurado:
+
+```bash
+docker compose up -d --build
+```
+
+Para visualizar os logs e parar os serviços:
+```bash
+docker compose logs -f
+docker compose down
+```
+
+### Opção 2: Via Docker CLI
+
+1. **Construir a imagem Docker:**
+   ```bash
+   docker build -t fastapi-crud-tasks .
+   ```
+
+2. **Executar o container:**
+   ```bash
+   # Utilizando o arquivo .env:
+   docker run -d -p 8000:8000 --env-file .env --name fastapi-tasks-app fastapi-crud-tasks
+
+   # Ou informando a variável diretamente:
+   docker run -d -p 8000:8000 -e SECRET_SIGNATURE="sua_chave_secreta" --name fastapi-tasks-app fastapi-crud-tasks
+   ```
+
+3. **Gerenciar o container:**
+   ```bash
+   # Ver logs:
+   docker logs -f fastapi-tasks-app
+
+   # Parar o container:
+   docker stop fastapi-tasks-app
+   ```
+
+A API estará disponível na porta `8000`: `http://localhost:8000`
+
+---
+
 ## 📚 Documentação Interativa da API
 
-Com a aplicação em execução, acesse a documentação interativa gerada automaticamente pelo FastAPI:
+Com a aplicação em execução (seja local ou via Docker), acesse a documentação interativa gerada automaticamente pelo FastAPI:
 
 - **Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **ReDoc:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)

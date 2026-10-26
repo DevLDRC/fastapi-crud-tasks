@@ -1,0 +1,27 @@
+# Ambientes virtuais e pacotes
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Git e metadados
+.git/
+.gitignore
+
+# Configurações de ambiente locais
+.env
+
+# Testes e cobertura
+tests/
+.pytest_cache/
+junit/
+
+# Banco de dados SQLite local
+sql_app.db
+
+# Configurações de IDE
+.vscode/
+.idea/
+
+# CI / GitHub
+.github/

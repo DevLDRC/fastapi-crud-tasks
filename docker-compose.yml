@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-crud-tasks
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_SIGNATURE=${SECRET_SIGNATURE:-chave_secreta_jwt_padrao_docker}
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
